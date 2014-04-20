@@ -1,9 +1,9 @@
 #!/usr/local/bin/python2.7
 # encoding: utf-8
 '''
-ddapp -- Dice Dare CLI app
+dicedaretabase -- Dice Dare CLI app
 
-ddapp is small CLI application which lets you do different kind of dice dares.
+dicedaretabase is small CLI application which lets you do different kind of dice dares.
 
 It defines classes_and_methods
 
@@ -13,7 +13,6 @@ It defines classes_and_methods
 
 @license:    license
 
-@contact:    user_email
 @deffield    updated: 20-4-2014
 '''
 
@@ -39,21 +38,6 @@ class CLIError(Exception):
 
 def showmenu(daretypes):
     print(daretypes)
-
-def main(argv=None): # IGNORE:C0111
-    '''Command line options.'''
-
-    if argv is None:
-        argv = sys.argv
-    else:
-        sys.argv.extend(argv)
-
-    program_name = os.path.basename(sys.argv[0])
-    program_version = "v%s" % __version__
-    program_build_date = str(__updated__)
-    program_version_message = '%%(prog)s %s (%s)' % (program_version, program_build_date)
-    program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
-
 
 # Get the input from the user
 daretype = raw_input("Choose a type of dare by typing a number: ")
