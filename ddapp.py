@@ -20,7 +20,9 @@ import sys
 import os
 import sqlite3
 
-conn = sqlite3.connect('daretabase.db')
+con = sqlite3.connect('daretabase.db')
+cur = con.cursor()
+
 __all__ = []
 __version__ = 0.1
 __date__ = '2014-04-20'
@@ -36,8 +38,12 @@ class CLIError(Exception):
     def __unicode__(self):
         return self.msg
 
-def showmenu(daretypes):
-    print(daretypes)
+
+
+cur.execute("SELECT * FROM 'daretypes'")
+daretypes = cur.fetchall()
+for type in daretypes:
+    print("{0} for {1}").format(type[0], type[1])
 
 # Get the input from the user
 daretype = raw_input("Choose a type of dare by typing a number: ")
@@ -50,4 +56,3 @@ except:
 
 if daretype < 9:
     print(daretype)
-
