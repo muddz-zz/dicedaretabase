@@ -38,12 +38,22 @@ class CLIError(Exception):
     def __unicode__(self):
         return self.msg
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
 
 
+#Get all the dare types from the database
 cur.execute("SELECT * FROM 'daretypes'")
 daretypes = cur.fetchall()
-for type in daretypes:
-    print("{0} for {1}").format(type[0], type[1])
+
+#Print a row for each of the types
+for daretype in daretypes:
+    print(bcolors.HEADER + "{0} - {1}" + bcolors.ENDC).format(daretype[0], daretype[1])
 
 # Get the input from the user
 daretype = raw_input("Choose a type of dare by typing a number: ")
@@ -54,5 +64,15 @@ try:
 except:
     print("Got shit in your eyes, you did not enter a number?")
 
-if daretype < 9:
-    print(daretype)
+if daretype <= 6:
+
+    os.system("clear") #This only works at linux, I guess?
+    cur.execute("SELECT * FROM dares WHERE daretype = (?)", (daretype,))
+    dares = cur.fetchall()
+    for dare in dares:
+        print(bcolors.HEADER + "{0} - {1}" + bcolors.ENDC).format(dare[0], dare[2])
+
+    dares = raw_input("Which dare would you like from this category?: ")
+
+
+
