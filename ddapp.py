@@ -19,6 +19,7 @@ It defines classes_and_methods
 import sys
 import os
 import sqlite3
+import random
 
 con = sqlite3.connect('daretabase.db')
 cur = con.cursor()
@@ -46,6 +47,24 @@ class bcolors:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
 
+# The function that actually throws all the steps on the screen
+def showDare(dare):
+    print(bcolors.HEADER + "So, you are going to do the " + dare[2] + " dare. Good choice." + bcolors.ENDC)
+
+    cur.execute("SELECT * FROM steps WHERE dare = (?)", (dare[0],))
+    steps = cur.fetchall()
+
+    for step in steps:
+        print(step[3])
+        raw_input(bcolors.OKGREEN + "Press any key to see what you rolled" + bcolors.ENDC)
+        outcome = random.randrange(1,6)
+        print("Ow, you got a {0}!").format(outcome)
+
+
+
+
+
+
 
 #Get all the dare types from the database
 cur.execute("SELECT * FROM 'daretypes'")
@@ -63,16 +82,25 @@ try:
     daretype = int(daretype)
 except:
     print("Got shit in your eyes, you did not enter a number?")
+    sys.exit()
 
 if daretype <= 6:
 
-    os.system("clear") #This only works at linux, I guess?
+    os.system('cls' if os.name == 'nt' else 'clear')
     cur.execute("SELECT * FROM dares WHERE daretype = (?)", (daretype,))
     dares = cur.fetchall()
     for dare in dares:
         print(bcolors.HEADER + "{0} - {1}" + bcolors.ENDC).format(dare[0], dare[2])
 
-    dares = raw_input("Which dare would you like from this category?: ")
+    try:
+        dares = raw_input("Which dare would you like from this category?: ")
+        os.system('cls' if os.name == 'nt' else 'clear')
+    except:
+        print("Well, that is not really a number, now is it?")
+        sys.exit()
+
+    showDare(dare)
+
 
 
 
