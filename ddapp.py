@@ -20,6 +20,7 @@ import sys
 import os
 import sqlite3
 import random
+import collections
 
 con = sqlite3.connect('daretabase.db')
 cur = con.cursor()
@@ -111,6 +112,48 @@ class AddDare:
         else:
             print("You didn't enter a valid choice, please do next time.")
             self.addDare()
+        darename = raw_input("And how would you want to call the dice dare?: ")
+        nickname = raw_input("And what is your (nick)name?: ")
+        cur.execute("INSERT INTO dares VALUES (NULL, ?, ?, ?)", (choice, darename, nickname))
+        dareid = cur.lastrowid
+
+        print(
+              """We are going to go through each step of the dice dare,
+              For each step I will ask you how to call the step and
+              What the possible outcomes are.
+              Right now, every step needs 6 outcomes.""")
+
+        # declare a bool to check if there are any more steps coming after this
+        stop = False
+
+        stepnr = 1
+        while not stop:
+            steptext = raw_input("For this step, the dare-y needs to: ")
+
+            cur.execute("INSERT INTO steps VALUES (NULL, ?, ?, ?)",
+                        (dareid, stepnr, steptext))
+
+            print("Great idea! And what are the outcomes going to be?")
+            for i in range(1, 7):
+                text = raw_input("What does the dare-y have to do when rolling a {0}: ".format(i))
+
+                cur.execute("INSERT INTO outcomes VALUES (NULL, ?, ?, ?, ?)",
+                        (dareid, i, text, stepnr))
+
+            cont = raw_input("""If this was the last step, type 'q' without quotes,
+            If you want to continue adding steps, press any other key.""")
+
+            if cont == "q":
+                stop = True
+            else:
+                pass
+        con.commit()
+
+
+
+
+        stepnr += 1
+
 
 
 
