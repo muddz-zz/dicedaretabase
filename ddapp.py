@@ -40,36 +40,34 @@ def main():
     Press 3 to export a dare (not implemented yet)
     ''')
 
-    try:
-        choice = int(raw_input("What would you like to do?: "))
-    except:
-        choice = 0
-        print("That is hardly a number, now is it?")
+    choice = raw_input("What would you like to do?: ")
+    choice = toInt(choice)
+
 
     if choice == 1:
-        Menu().daremenu()
+        Menu().chooseTypeMenu()
     elif choice == 2:
-        pass
+        Menu().addDareMenu()
+
     elif choice == 3:
         pass
     else:
-        print("You didn't enter a valid choice, please try again.")
         main()
 
-
-# class CLIError(Exception):
-#     '''Generic exception to raise and log different fatal errors.'''
-#     def __init__(self, msg):
-#         super(CLIError).__init__(type(self))
-#         self.msg = "E: %s" % msg
-#
-#     def __str__(self):
-#         return self.msg
-#
-#     def __unicode__(self):
-#         return self.msg
+#this function tries to convert a users input to int
+#If it does not work it throws an exception, also all the tables.
+# (╯°□°）╯︵ ┻━┻
 
 
+def toInt(i):
+    try:
+        i = int(i)
+    except:
+        print("Got shit in your eyes? You did not enter a number, please do.")
+    return i
+
+
+# Colors and stuff
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -83,11 +81,8 @@ class bcolors:
 class ShowDare:
 
     def show(self, dare):
-        print(bcolors.HEADER
-              + "So, you are going to do the " + dare[2]
-              + " dare. Good choice." + bcolors.ENDC)
 
-        cur.execute("SELECT * FROM steps WHERE dare = (?)", (dare[0],))
+        cur.execute("SELECT * FROM steps WHERE dare = (?)", (dare,))
         steps = cur.fetchall()
 
         for step in steps:
@@ -99,16 +94,38 @@ class ShowDare:
             print("Ow, you got a {0}!").format(outcome)
 
 
+class AddDare:
+
+    def addDare(self):
+        print(bcolors.HEADER
+              + "What kind of dare do you want to add?"
+              + bcolors.ENDC)
+
+        # Asks for the list of dare types and displays the menu.
+        darenumbers = Menu().listDareTypes()
+        choice = raw_input("I choose number:")
+        choice = toInt(choice)
+        if choice in darenumbers:
+            print("You choose number {0}, lets get started shall we?") \
+            .format(choice)
+        else:
+            print("You didn't enter a valid choice, please do next time.")
+            self.addDare()
+
+
+
+
 class Menu:
 
-    # Info for the dare listing menu
-    def daremenu(self):
+    #Lists the current dare types and returns a list with ints corresponding
+    #the types in de daretabase.
+    def listDareTypes(self):
 
         #Get all the dare types from the database
         cur.execute("SELECT * FROM 'daretypes'")
         daretypes = cur.fetchall()
 
-        # create a list with dare numbers to check against later.
+        #Create a list with dare numbers to check against.
         #Might be there is a way more elegant solution for this though
         darenumbers = []
 
@@ -121,16 +138,19 @@ class Menu:
             # Add the number of the current type to the list
             darenumbers.append(daretype[0])
 
+        return darenumbers
+
+    # Info for the dare listing menu
+    def chooseTypeMenu(self):
+
+        # Asks for the list of dare types and displays the menu.
+        darenumbers = self.listDareTypes()
+
         # Get the input from the user
         daretype = raw_input("Choose a type of dare by typing a number: ")
         # Check if the input was actually a number
-
-        try:
-            daretype = int(daretype)
-        except:
-            print("Got shit in your eyes, you did not enter a number")
-
-            sys.exit()
+        #try to convert to int
+        daretype = toInt(daretype)
 
         if daretype in darenumbers:
             # Clear the screen again and display the different dare types
@@ -145,18 +165,19 @@ class Menu:
                       + "{0} - {1}"
                       + bcolors.ENDC).format(dare[0], dare[2])
 
-            try:
-                dares = \
-                raw_input("Which dare would you like from this category?: ")
-                os.system('cls' if os.name == 'nt' else 'clear')
-            except:
-                print("Well, that is not really a number, now is it?")
-                sys.exit()
+            dare = raw_input("Which dare would you like from this category?: ")
+            dare = toInt(dare)
 
             ShowDare().show(dare)
+
+    def addDareMenu(self):
+        print("""So you want to add a new dare to the daretabase? Great!
+If you like to share your dare afterwards, you can do so by exporting
+it to a file and emailing or PMing it to me.
+""")
+        AddDare().addDare()
+
 
 #initiates the __main__ function
 if __name__ == "__main__":
     main()
-
-
