@@ -37,7 +37,7 @@ def main():
 
     print('''What would you like to do?
     Press 1 to show the different dare groups
-    Press 2 to add a dare (not implemented yet)
+    Press 2 to add a dare
     Press 3 to export a dare (not implemented yet)
     ''')
 
@@ -91,8 +91,15 @@ class ShowDare:
             raw_input(bcolors.OKGREEN
                       + "Press any key to see what you rolled"
                       + bcolors.ENDC)
-            outcome = random.randrange(1, 6)
-            print("Ow, you got a {0}!").format(outcome)
+            roll = random.randrange(1, 6)
+            cur.execute("SELECT outcome FROM outcomes WHERE dare = (?) and step = (?)",
+                        (dare, step[2]))
+            outcome = cur.fetchone()
+            print("Ow, you rolled a {0}, that means you got: {1}!") \
+            .format(roll, outcome[0])
+            raw_input(bcolors.OKBLUE
+                      + "Ready for the next step? lets go!"
+                      + bcolors.ENDC)
 
 
 class AddDare:
@@ -114,7 +121,8 @@ class AddDare:
             self.addDare()
         darename = raw_input("And how would you want to call the dice dare?: ")
         nickname = raw_input("And what is your (nick)name?: ")
-        cur.execute("INSERT INTO dares VALUES (NULL, ?, ?, ?)", (choice, darename, nickname))
+        cur.execute("INSERT INTO dares VALUES (NULL, ?, ?, ?)",
+                    (choice, darename, nickname))
         dareid = cur.lastrowid
 
         print(
@@ -146,15 +154,8 @@ class AddDare:
             if cont == "q":
                 stop = True
             else:
-                pass
+                stepnr += 1
         con.commit()
-
-
-
-
-        stepnr += 1
-
-
 
 
 
