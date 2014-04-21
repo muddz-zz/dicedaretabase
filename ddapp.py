@@ -29,6 +29,17 @@ __version__ = 0.1
 __date__ = '2014-04-20'
 __updated__ = '2014-04-20'
 
+#The first function that starts, redirects to the different functions of the program
+def main():
+
+    print("derp")
+
+
+
+    Menu().daremenu()
+
+
+
 class CLIError(Exception):
     '''Generic exception to raise and log different fatal errors.'''
     def __init__(self, msg):
@@ -47,60 +58,66 @@ class bcolors:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
 
+
+
+
 # The function that actually throws all the steps on the screen
-def showDare(dare):
-    print(bcolors.HEADER + "So, you are going to do the " + dare[2] + " dare. Good choice." + bcolors.ENDC)
+class ShowDare:
+    def show(self, dare):
+        print(bcolors.HEADER + "So, you are going to do the " + dare[2] + " dare. Good choice." + bcolors.ENDC)
 
-    cur.execute("SELECT * FROM steps WHERE dare = (?)", (dare[0],))
-    steps = cur.fetchall()
+        cur.execute("SELECT * FROM steps WHERE dare = (?)", (dare[0],))
+        steps = cur.fetchall()
 
-    for step in steps:
-        print(step[3])
-        raw_input(bcolors.OKGREEN + "Press any key to see what you rolled" + bcolors.ENDC)
-        outcome = random.randrange(1,6)
-        print("Ow, you got a {0}!").format(outcome)
+        for step in steps:
+            print(step[3])
+            raw_input(bcolors.OKGREEN + "Press any key to see what you rolled" + bcolors.ENDC)
+            outcome = random.randrange(1,6)
+            print("Ow, you got a {0}!").format(outcome)
 
+class Menu:
 
+    # Info for the dare listing menu
+    def daremenu(self):
 
+        #Get all the dare types from the database
+        cur.execute("SELECT * FROM 'daretypes'")
+        daretypes = cur.fetchall()
 
+        #Print a row for each of the types
+        for daretype in daretypes:
+            print(bcolors.HEADER + "{0} - {1}" + bcolors.ENDC).format(daretype[0], daretype[1])
 
+        # Get the input from the user
+        daretype = raw_input("Choose a type of dare by typing a number: ")
+        # Check if the input was actually a number
+        try:
+            #todo: replace this by checking the actual list
+            daretype = int(daretype)
+        except:
+            print("Got shit in your eyes, you did not enter a number?")
+            sys.exit()
 
+        if daretype <= 6:
+            # Clear the screen again and display the different dare types
 
-#Get all the dare types from the database
-cur.execute("SELECT * FROM 'daretypes'")
-daretypes = cur.fetchall()
+            os.system('cls' if os.name == 'nt' else 'clear')
+            cur.execute("SELECT * FROM dares WHERE daretype = (?)", (daretype,))
+            dares = cur.fetchall()
+            for dare in dares:
+                print(bcolors.HEADER + "{0} - {1}" + bcolors.ENDC).format(dare[0], dare[2])
 
-#Print a row for each of the types
-for daretype in daretypes:
-    print(bcolors.HEADER + "{0} - {1}" + bcolors.ENDC).format(daretype[0], daretype[1])
+            try:
+                dares = raw_input("Which dare would you like from this category?: ")
+                os.system('cls' if os.name == 'nt' else 'clear')
+            except:
+                print("Well, that is not really a number, now is it?")
+                sys.exit()
 
-# Get the input from the user
-daretype = raw_input("Choose a type of dare by typing a number: ")
-# Check if the input was actually a number
-try:
-    #todo: replace this by checking the actual list
-    daretype = int(daretype)
-except:
-    print("Got shit in your eyes, you did not enter a number?")
-    sys.exit()
+            ShowDare().show(dare)
 
-if daretype <= 6:
-
-    os.system('cls' if os.name == 'nt' else 'clear')
-    cur.execute("SELECT * FROM dares WHERE daretype = (?)", (daretype,))
-    dares = cur.fetchall()
-    for dare in dares:
-        print(bcolors.HEADER + "{0} - {1}" + bcolors.ENDC).format(dare[0], dare[2])
-
-    try:
-        dares = raw_input("Which dare would you like from this category?: ")
-        os.system('cls' if os.name == 'nt' else 'clear')
-    except:
-        print("Well, that is not really a number, now is it?")
-        sys.exit()
-
-    showDare(dare)
-
-
+#initiates the __main__ function
+if __name__ == "__main__":
+    main()
 
 
