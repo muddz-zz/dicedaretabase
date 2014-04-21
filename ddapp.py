@@ -32,11 +32,28 @@ __updated__ = '2014-04-20'
 #The first function that starts, redirects to the different functions of the program
 def main():
 
-    print("derp")
+    print('''What would you like to do?
+    Press 1 to show the different dare groups
+    Press 2 to add a dare (not implemented yet)
+    Press 3 to export a dare (not implemented yet)
+    ''')
+
+    try:
+        choice = int(raw_input("What would you like to do?: "))
+    except:
+        choice = 0
+        print("That is hardly a number, now is it?")
 
 
-
-    Menu().daremenu()
+    if choice == 1:
+        Menu().daremenu()
+    elif choice == 2:
+        pass
+    elif choice == 3:
+        pass
+    else:
+        print("You didn't enter a valid choice, please try again.")
+        main()
 
 
 
@@ -57,9 +74,6 @@ class bcolors:
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
-
-
-
 
 # The function that actually throws all the steps on the screen
 class ShowDare:
