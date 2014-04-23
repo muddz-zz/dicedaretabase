@@ -87,16 +87,31 @@ class ShowDare:
         steps = cur.fetchall()
 
         for step in steps:
-            print(step[3])
-            raw_input(bcolors.OKGREEN
-                      + "Press any key to see what you rolled"
-                      + bcolors.ENDC)
+            if step[2] == 1:
+                raw_input(bcolors.OKGREEN
+                          + "Welcome to this dare, press enter if you are ready"
+                          + bcolors.ENDC)
             roll = random.randrange(1, 6)
             cur.execute("SELECT outcome FROM outcomes WHERE dare = (?) and step = (?)",
                         (dare, step[2]))
+
             outcome = cur.fetchone()
-            print("Ow, you rolled a {0}, that means you got: {1}!") \
-            .format(roll, outcome[0])
+
+
+            if "_X_" in step[3]:
+
+                #Replace the _X_ in the step string
+                add = step[3].replace('_X_', outcome[0])
+                print("""You rolled a {0}
+                that means you have to {1}!""")\
+                .format(roll, add)
+            else:
+                #Display the step
+                print(step[3])
+                print("""You rolled a {0}, that means you got: {1}!""")\
+                .format(roll, outcome[0])
+
+
             raw_input(bcolors.OKBLUE
                       + "Ready for the next step? lets go!"
                       + bcolors.ENDC)
@@ -136,6 +151,11 @@ class AddDare:
 
         stepnr = 1
         while not stop:
+            print(
+            """If you want to include a number in the dare, type _X_
+            So ex: 'Run around for _X_ KM'
+            If you do so, remember to only give outcomes that fit the scentence
+            """)
             steptext = raw_input("For this step, the dare-y needs to: ")
 
             cur.execute("INSERT INTO steps VALUES (NULL, ?, ?, ?)",
@@ -148,7 +168,8 @@ class AddDare:
                 cur.execute("INSERT INTO outcomes VALUES (NULL, ?, ?, ?, ?)",
                         (dareid, i, text, stepnr))
 
-            cont = raw_input("""If this was the last step, type 'q' without quotes,
+            cont = raw_input(
+            """If this was the last step, type 'q' without quotes,
             If you want to continue adding steps, press any other key.""")
 
             if cont == "q":
