@@ -16,6 +16,7 @@ It defines classes_and_methods
 @deffield    updated: 20-4-2014
 '''
 
+import xml.etree.ElementTree as ET
 import sys
 import os
 import sqlite3
@@ -38,7 +39,7 @@ def main():
     print('''What would you like to do?
     Press 1 to show the different dare groups
     Press 2 to add a dare
-    Press 3 to export a dare (not implemented yet)
+    Press 3 to export a dare
     ''')
 
     choice = raw_input("What would you like to do?: ")
@@ -46,20 +47,18 @@ def main():
 
 
     if choice == 1:
-        Menu().chooseTypeMenu()
+        Menu().showDares()
     elif choice == 2:
         Menu().addDareMenu()
 
     elif choice == 3:
-        pass
+        Menu().exportDareMenu()
     else:
         main()
 
 #this function tries to convert a users input to int
 #If it does not work it throws an exception, also all the tables.
 # (╯°□°）╯︵ ┻━┻
-
-
 def toInt(i):
     try:
         i = int(i)
@@ -76,6 +75,52 @@ class bcolors:
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
+
+
+# This function tries to export dice dares to an XML file
+class ExportDare:
+
+    def export(self):
+        print("Which dare do you want to export?")
+        choice = Menu().chooseTypeMenu()
+
+        cur.execute("SELECT * FROM dares WHERE id = (?)", (choice,))
+        d = cur.fetchone()
+
+        cur.execute("SELECT * FROM steps WHERE dare = (?)", (choice,))
+        steps = cur.fetchall()
+
+        # Build the XML file
+
+        dare = ET.Element("dare")
+
+        dare.set("name", d[2])
+        dare.set("author", d[3])
+
+        for s in steps:
+            step = ET.SubElement(dare, "step")
+            # stepnr = ET.SubElement(step, str(s[2]))
+            step.set("id", str(s[2]))
+            # step.text = s[3]
+            step.set("text", s[3])
+
+            cur.execute("SELECT * FROM outcomes WHERE dare = (?) and step = (?)",
+                        (d[0], s[2]))
+            outcomes = cur.fetchall()
+
+            for o in outcomes:
+                outcome = ET.SubElement(step, "outcome")
+                outcome.text = str(o[3])
+
+                # roll = ET.SubElement(outcome, "roll")
+                outcome.set = ("roll", str(o[2]))
+
+                outcome.set = ("step", str(o[4]))
+
+        tree = ET.ElementTree(dare)
+        tree.write("dare.xml")
+
+
 
 
 # The function that actually throws all the steps on the screen
@@ -232,8 +277,12 @@ class Menu:
 
             dare = raw_input("Which dare would you like from this category?: ")
             dare = toInt(dare)
+            return dare
 
-            ShowDare().show(dare)
+    def showDares(self):
+
+        dare = Menu.chooseTypeMenu(self)
+        ShowDare().show(dare)
 
     def addDareMenu(self):
         print("""So you want to add a new dare to the daretabase? Great!
@@ -241,6 +290,11 @@ If you like to share your dare afterwards, you can do so by exporting
 it to a file and emailing or PMing it to me.
 """)
         AddDare().addDare()
+
+    def exportDareMenu(self):
+
+        ExportDare().export()
+
 
 
 #initiates the __main__ function
