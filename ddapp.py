@@ -36,6 +36,21 @@ __updated__ = '2014-04-20'
 #redirects to the different functions of the program
 def main():
 
+    #Create database if it doesn't exist.
+    cur.execute("""CREATE TABLE IF NOT EXISTS daretypes (id INTEGER PRIMARY KEY, name TEXT)""")
+    cur.execute("""CREATE TABLE IF NOT EXISTS dares(
+    id INTEGER PRIMARY KEY, daretype INTEGER, name TEXT, author TEXT,
+    FOREIGN KEY (daretype) REFERENCES daretypes(id))""")
+    cur.execute("""CREATE TABLE IF NOT EXISTS steps(
+    id INTEGER PRIMARY KEY, dare INTEGER, stepnr INTEGER, text TEXT,
+    FOREIGN KEY (dare) REFERENCES dares(id))""")
+    cur.execute("""CREATE TABLE IF NOT EXISTS outcomes(
+    id INTEGER PRIMARY KEY, dare INTEGER, roll INTEGER, outcome TEXT,
+    step INTEGER, FOREIGN KEY (dare) REFERENCES dares(id),
+    FOREIGN KEY (step) REFERENCES steps(id))""")
+
+
+
     print('''What would you like to do?
     Press 1 to show the different dare groups
     Press 2 to add a dare
@@ -44,7 +59,6 @@ def main():
 
     choice = raw_input("What would you like to do?: ")
     choice = toInt(choice)
-
 
     if choice == 1:
         Menu().showDares()
@@ -119,8 +133,6 @@ class ExportDare:
 
         tree = ET.ElementTree(dare)
         tree.write("dare.xml")
-
-
 
 
 # The function that actually throws all the steps on the screen
