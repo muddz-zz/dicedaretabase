@@ -83,12 +83,19 @@ def toInt(i):
 
 # Colors and stuff
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
+    # Got rid of the colours as windows gives zero shits about them
+    #HEADER = '\033[95m'
+    HEADER = ""
+    # OKBLUE = '\033[94m'
+    OKBLUE = ""
+    # OKGREEN = '\033[92m'
+    OKGREEN = ""
+    # WARNING = '\033[93m'
+    WARNING = ""
+    # FAIL = '\033[91m'
+    FAIL = ""
+    # ENDC = '\033[0m'
+    ENDC = ""
 
 
 # This function tries to export dice dares to an XML file
